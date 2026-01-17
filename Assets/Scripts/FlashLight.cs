@@ -6,6 +6,9 @@ public class FlashLight : MonoBehaviour
 {
     public GameObject light;
     private bool isOn = true;
+    public float checkDistance = 0.1f;
+    public bool hittingWall = false;
+    public LayerMask hittingLayers;
 
     void Start()
     {
@@ -15,10 +18,27 @@ public class FlashLight : MonoBehaviour
 
     void Update()   
     {
-        if(Input.GetMouseButtonDown(1))
+        CheckWall();
+        if(!hittingWall)
         {
-            isOn = !isOn;
+            if(Input.GetMouseButtonDown(1))
+            {
+                isOn = !isOn;
+            }
+            
             light.SetActive(isOn);
         }
+        else
+        {
+            light.SetActive(!hittingWall);
+        }
+    }
+
+    void CheckWall()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(gameObject.transform.position, transform.right, checkDistance, hittingLayers);
+        hittingWall = hit.collider ? true: false;
+
+        Debug.DrawRay(gameObject.transform.position, transform.right * checkDistance, Color.red);
     }
 }
