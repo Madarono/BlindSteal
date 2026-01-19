@@ -9,6 +9,13 @@ public enum PlayerMovementState
     Sprinting
 }
 
+[System.Serializable]
+public class WeaponSwitch
+{
+    public GameObject weapon;
+    public Sprite playerSprite;
+}
+
 public class Player : MonoBehaviour
 {
     public PlayerMovementState moveState;
@@ -34,8 +41,15 @@ public class Player : MonoBehaviour
     public float dashPrice = 10f;
     public bool canDash = true;
 
+    [Header("Switching Weapons")]
+    public WeaponSwitch[] switches;
+    public int switchID;
+    private GameObject previousWeapon;
+
+
     [Header("Visual")]
     public GameObject playerSprite;
+    public SpriteRenderer playerRend;
     public Image sprintBar;
     public GameObject interact;
     public int lastID;
@@ -46,6 +60,12 @@ public class Player : MonoBehaviour
 
     void Start()
     {
+        foreach(var s in switches)
+        {
+            s.weapon.SetActive(false);
+        }
+
+        SwitchWeapon();
         interact.SetActive(false);
         lastID = -1;
         lastObject = null;
@@ -60,6 +80,7 @@ public class Player : MonoBehaviour
         //Movement
         moveX = Input.GetAxisRaw("Horizontal");
         moveY = Input.GetAxisRaw("Vertical");
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
 
         Vector2 move = new Vector2(moveX, moveY).normalized;
         transform.Translate(move * speed * Time.deltaTime);
@@ -111,6 +132,20 @@ public class Player : MonoBehaviour
             Dash();
         }
 
+        //Switching Weapons
+        if(scroll > 0f)
+        {
+            switchID++;
+            switchID = Mathf.Clamp(switchID, 0, switches.Length - 1);
+            SwitchWeapon();
+        }
+        else if(scroll < 0f)
+        {
+            switchID--;
+            switchID = Mathf.Clamp(switchID, 0, switches.Length - 1);
+            SwitchWeapon();
+        }
+
     }
 
     void Dash()
@@ -157,6 +192,17 @@ public class Player : MonoBehaviour
         Debug.DrawRay(transform.position, direction * dashDistance, Color.cyan, 0.2f);
     }
 
+    void SwitchWeapon()
+    {
+        if(previousWeapon != null)
+        {
+            previousWeapon.SetActive(false);
+        }
+
+        playerRend.sprite = switches[switchID].playerSprite;
+        previousWeapon = switches[switchID].weapon;
+        previousWeapon.SetActive(true);
+    }
     IEnumerator InitiateDash(Vector3 finalPlacement)
     {
         float t = 0;
