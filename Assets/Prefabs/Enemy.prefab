@@ -10,10 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 4987095709350071358}
   - component: {fileID: 6526259474238911658}
+  - component: {fileID: 7285916253851634983}
   - component: {fileID: 7069536189775521716}
   - component: {fileID: 3738541477157583256}
   - component: {fileID: 8527925493345887605}
-  m_Layer: 3
+  m_Layer: 7
   m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49,12 +50,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
+  detect: {fileID: 7285916253851634983}
   minInaccuracy: -10
   maxInaccuracy: 10
   speedOfLooking: 10
   gun: {fileID: 3418715533567566766}
   health: 12
-  speed: 2
+  speed: 4
   reloadTime: 0.75
   damage: 5
   shootRange: 5
@@ -64,8 +66,29 @@ MonoBehaviour:
   checkPosition: {fileID: 1237955137932271893}
   playerLayer:
     serializedVersion: 2
-    m_Bits: 72
+    m_Bits: 8
   deathPrefab: {fileID: 3999412648144074238, guid: b90d29618f320f740b0c7720f828472a, type: 3}
+--- !u!114 &7285916253851634983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 654536115059216795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05a5ec812236f4c40bd011d11f958411, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectedPlayer: 0
+  canCheck: 0
+  lingerDuration: 1.33
+  rayCount: 24
+  lookRange: 12
+  offsetPivot: 0
+  detectLayers:
+    serializedVersion: 2
+    m_Bits: 9
 --- !u!195 &7069536189775521716
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -171,7 +194,7 @@ GameObject:
   - component: {fileID: 340935722265311316}
   - component: {fileID: 4583908376299229001}
   - component: {fileID: 7628952758498080426}
-  m_Layer: 3
+  m_Layer: 7
   m_Name: EnemySprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -262,7 +285,11 @@ MonoBehaviour:
   shadowLayer:
     serializedVersion: 2
     m_Bits: 64
-  lights: []
+  lights:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   totalDistance: 6
   fadeSpeed: 10
 --- !u!1 &3669880842514976734
@@ -275,7 +302,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5989571172575240768}
   - component: {fileID: 1198439496280893610}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Light (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -356,7 +383,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1237955137932271893}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ShootPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -393,7 +420,7 @@ GameObject:
   - component: {fileID: 5431908343184864202}
   - component: {fileID: 413536219030622493}
   - component: {fileID: 6247539139527562048}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Glock
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -7,6 +7,7 @@ public class Enemy : MonoBehaviour
 {
     [SerializeField] Transform player;
     NavMeshAgent agent;
+    public EnemyDetect detect;
 
     [Header("Inaccuracy")]
     public float minInaccuracy = -10f;
@@ -56,6 +57,12 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
+        bool foundPlayer = detect.detectedPlayer;
+        agent.isStopped = !foundPlayer;
+        if(!foundPlayer)
+        {
+            return;
+        }
         agent.SetDestination(player.position);
         inLineOfSight = DetectPlayer();
 
@@ -97,7 +104,7 @@ public class Enemy : MonoBehaviour
         {    
             if(_hit.collider != null)
             {
-                Debug.Log(_hit.collider);
+                // Debug.Log(_hit.collider);
                 if(_hit.collider.gameObject.TryGetComponent(out Player player))
                 {
                     return true;
@@ -110,6 +117,7 @@ public class Enemy : MonoBehaviour
         return false;
     }
 
+    
     IEnumerator DelayBeforeShot()
     {
         float responseTime = Random.Range(minResponseTime, maxResponseTime);
