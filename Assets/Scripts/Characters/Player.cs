@@ -49,11 +49,13 @@ public class Player : MonoBehaviour
     public int switchID;
     private GameObject previousWeapon;
 
-
     [Header("Visual")]
     public GameObject playerSprite;
     public SpriteRenderer playerRend;
-    public Image sprintBar;
+    public BarSprites sprintBar;
+
+    [Header("Death")]
+    public GameObject deathPrefab;
 
     private float moveX;
     private float moveY;
@@ -96,6 +98,8 @@ public class Player : MonoBehaviour
         {
             speed = sprintSpeed;
             stamina = Mathf.Clamp(stamina - (drainMultiplyer * Time.deltaTime), 0, o_stamina);
+            Debug.Log(stamina / o_stamina);
+            sprintBar.UpdateBar(stamina / o_stamina);
         }
         else
         {
@@ -105,8 +109,9 @@ public class Player : MonoBehaviour
             }
             speed = moveSpeed;
             stamina = Mathf.Clamp(stamina + (increaseMultiplyer * Time.deltaTime), 0, o_stamina);
+            Debug.Log(stamina / o_stamina);
+            sprintBar.UpdateBar(stamina / o_stamina);
         }
-        sprintBar.fillAmount = stamina / o_stamina;
 
         //Dashing
         if(Input.GetKeyDown(settings.dash) && canDash && stamina >= dashPrice)
@@ -233,5 +238,24 @@ public class Player : MonoBehaviour
         canSprint = false;
         yield return new WaitForSeconds(sprintCooldown);
         canSprint = true;
+    }
+
+    public void Refresh()
+    {
+        if(health <= 0)
+        {
+            BloodManager.instance.DeathSplash(transform);
+            GameObject go = Instantiate(deathPrefab, transform.position, transform.rotation);
+            go.transform.rotation = playerSprite.transform.rotation;
+            if(go.TryGetComponent(out DeadBody goScript))
+            {
+                goScript.Fade();
+            }
+            if(go.TryGetComponent(out SpriteRenderer goRend))
+            {
+                goRend.sprite = playerRend.sprite;
+            }
+            Destroy(gameObject);
+        }
     }
 }

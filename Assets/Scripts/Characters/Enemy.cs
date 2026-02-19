@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum EnemyType
+{
+    Unarmed,
+    Armed,
+}
+
 public class Enemy : MonoBehaviour
 {
     [SerializeField] Transform player;
@@ -16,14 +22,23 @@ public class Enemy : MonoBehaviour
     private float inaccuracy;
 
     [Header("Attributes")]
-    public Gun gun;
+    public EnemyType type;
     public float health = 10f;
     public float speed = 2f;
+
+    [Header("Weapon")]
+    public Gun gun;
     public float reloadTime = 0.75f;
     public float damage = 5f;
     public float shootRange = 5f;
     public float minResponseTime = 0.8f;
     public float maxResponseTime = 1.2f;
+
+    [Header("Unramed")]
+    public bool canHit = true;
+    public float hitDamage = 2f;
+    public float hitCooldown = 0.1f;
+    public float hitRange = 0.2f;
 
     [Header("Check Player")]
     public float distanceFromPlayer = 3f;
@@ -47,6 +62,12 @@ public class Enemy : MonoBehaviour
         agent.updateUpAxis = false;
         agent.speed = speed;
         agent.stoppingDistance = distanceFromPlayer;
+        
+        if(type == EnemyType.Unarmed)
+        {
+            return;
+        }
+
         gun.shootCooldown = reloadTime;
         gun.damage = damage;
         gun.shootRange = shootRange;
@@ -57,6 +78,11 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
+        if(player == null)
+        {
+            return;
+        }
+        
         bool foundPlayer = detect.detectedPlayer;
         agent.isStopped = !foundPlayer;
         if(!foundPlayer)
@@ -66,7 +92,7 @@ public class Enemy : MonoBehaviour
         agent.SetDestination(player.position);
         inLineOfSight = DetectPlayer();
 
-        if(Vector2.Distance(player.position, transform.position) <= distanceFromPlayer && gun.canShoot && inLineOfSight)
+        if(type == EnemyType.Armed && Vector2.Distance(player.position, transform.position) <= distanceFromPlayer && gun.canShoot && inLineOfSight)
         {
             if(firstTime)
             {
@@ -77,6 +103,12 @@ public class Enemy : MonoBehaviour
             {
                 gun.Shoot();
             }
+        }
+        else if(Vector2.Distance(player.position, transform.position) <= distanceFromPlayer && inLineOfSight && canHit && type == EnemyType.Unarmed)
+        {
+            Punch();
+            canHit = false;
+            StartCoroutine(PunchCooldown());
         }
 
         //LookAt Player 
@@ -117,6 +149,25 @@ public class Enemy : MonoBehaviour
         return false;
     }
 
+    public void Punch()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(checkPosition.position, checkPosition.right, hitRange);
+        Debug.DrawRay(checkPosition.position, checkPosition.right * hitRange, Color.yellow);
+        if (hit.collider != null && hit.collider.gameObject != gameObject)
+        {
+            Debug.Log("Hit");
+            GameObject obj = hit.collider.gameObject;
+            if(obj.TryGetComponent(out Player player))
+            {
+                BloodManager.instance.MakeBloodParticle(obj.transform);
+                BloodManager.instance.MakeBloodSplash(obj.transform, damage);
+                player.health -= damage;
+                BloodManager.instance.ScreenShake(1f, 1f, 1f);
+                player.Refresh();
+            }
+        }
+    }
+
     
     IEnumerator DelayBeforeShot()
     {
@@ -128,6 +179,14 @@ public class Enemy : MonoBehaviour
             gun.Shoot();
         }
     }
+
+    IEnumerator PunchCooldown()
+    {
+        canHit = false;
+        yield return new WaitForSeconds(hitCooldown);
+        canHit = true;
+    }
+
     public void Refresh()
     {
         if(health <= 0)

@@ -67,7 +67,7 @@ public class Gun : MonoBehaviour
                 BloodManager.instance.MakeBloodSplash(obj.transform, damage);
                 player.health -= damage;
                 BloodManager.instance.ScreenShake(1f, 1f, 1f);
-                //Make effect of red around camera and a slight shake
+                player.Refresh();
             }
         }
         else

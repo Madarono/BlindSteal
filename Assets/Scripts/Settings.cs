@@ -12,6 +12,7 @@ public class Settings : MonoBehaviour
     public KeyCode dash = KeyCode.Space;
 
     public Light2D[] totalLights;
+    public Light2D globalLight;
 
     void Awake()
     {

@@ -13,6 +13,7 @@ public class ShadowVisibility : MonoBehaviour
     public float totalDistance = 10f;
 
     [Header("Fade Settings")]
+    public float minGlobalLightIntensity = 0.2f;
     public float fadeSpeed = 6f;
 
     float currentAlpha = 0f;
@@ -24,11 +25,18 @@ public class ShadowVisibility : MonoBehaviour
 
     void Update()
     {
+        if(Settings.instance.globalLight.intensity > minGlobalLightIntensity)
+        {   
+            Color c_default = spriteRend.color;
+            spriteRend.color = new Color(c_default.r, c_default.g, c_default.b, 1);
+            return;
+        }
+
         float targetAlpha = 0f;
 
         foreach (var light in lights)
         {
-            if(!light.enabled || !light.gameObject.activeInHierarchy)
+            if(light == null || !light.enabled || !light.gameObject.activeInHierarchy)
             {
                 continue;
             }

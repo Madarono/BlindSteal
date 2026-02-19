@@ -54,15 +54,20 @@ MonoBehaviour:
   minInaccuracy: -10
   maxInaccuracy: 10
   speedOfLooking: 10
-  gun: {fileID: 3418715533567566766}
+  type: 1
   health: 12
   speed: 4
+  gun: {fileID: 3418715533567566766}
   reloadTime: 0.75
   damage: 5
   shootRange: 5
   minResponseTime: 0.8
   maxResponseTime: 1.2
-  distanceFromPlayer: 3
+  canHit: 1
+  hitDamage: 2
+  hitCooldown: 0.1
+  hitRange: 0.2
+  distanceFromPlayer: 4
   checkPosition: {fileID: 1237955137932271893}
   playerLayer:
     serializedVersion: 2
@@ -85,7 +90,6 @@ MonoBehaviour:
   lingerDuration: 1.33
   rayCount: 24
   lookRange: 12
-  offsetPivot: 0
   detectLayers:
     serializedVersion: 2
     m_Bits: 9
@@ -258,7 +262,7 @@ SpriteRenderer:
   m_SortingLayerID: -1915765635
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 7b98cc7753de1ec4ea93433c7fac1f8d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 911245ed370fff848ac64db8a56f055a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -291,6 +295,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   totalDistance: 6
+  minGlobalLightIntensity: 0.2
   fadeSpeed: 10
 --- !u!1 &3669880842514976734
 GameObject:
@@ -684,4 +689,5 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   totalDistance: 6
+  minGlobalLightIntensity: 0.2
   fadeSpeed: 10
