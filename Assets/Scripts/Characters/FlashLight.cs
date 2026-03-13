@@ -21,7 +21,7 @@ public class FlashLight : MonoBehaviour
         CheckWall();
         if(!hittingWall)
         {
-            if(Input.GetMouseButtonDown(1))
+            if(Input.GetMouseButtonDown(1) && !BuildingSystem.instance.isBuilding)
             {
                 isOn = !isOn;
             }

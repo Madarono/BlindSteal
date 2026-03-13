@@ -21,6 +21,7 @@ public class ShadowVisibility : MonoBehaviour
     void Start()
     {
         lights = Settings.instance.totalLights;
+        Settings.instance.visibles.Add(this);
     }
 
     void Update()

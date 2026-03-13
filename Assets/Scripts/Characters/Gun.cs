@@ -26,7 +26,7 @@ public class Gun : MonoBehaviour
     }
     void Update()
     {
-        if(isBot) //Robot Logic
+        if(isBot || BuildingSystem.instance.isBuilding) //Robot Logic
         {
             return;   
         }

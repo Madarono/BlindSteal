@@ -98,7 +98,7 @@ public class Player : MonoBehaviour
         {
             speed = sprintSpeed;
             stamina = Mathf.Clamp(stamina - (drainMultiplyer * Time.deltaTime), 0, o_stamina);
-            Debug.Log(stamina / o_stamina);
+            // Debug.Log(stamina / o_stamina);
             sprintBar.UpdateBar(stamina / o_stamina);
         }
         else
@@ -109,7 +109,7 @@ public class Player : MonoBehaviour
             }
             speed = moveSpeed;
             stamina = Mathf.Clamp(stamina + (increaseMultiplyer * Time.deltaTime), 0, o_stamina);
-            Debug.Log(stamina / o_stamina);
+            // Debug.Log(stamina / o_stamina);
             sprintBar.UpdateBar(stamina / o_stamina);
         }
 
@@ -120,13 +120,13 @@ public class Player : MonoBehaviour
         }
 
         //Switching Weapons
-        if(scroll > 0f)
+        if(scroll > 0f && !BuildingSystem.instance.isBuilding)
         {
             switchID++;
             switchID = Mathf.Clamp(switchID, 0, switches.Length - 1);
             SwitchWeapon();
         }
-        else if(scroll < 0f)
+        else if(scroll < 0f && !BuildingSystem.instance.isBuilding)
         {
             switchID--;
             switchID = Mathf.Clamp(switchID, 0, switches.Length - 1);
@@ -139,35 +139,35 @@ public class Player : MonoBehaviour
     {
         float x = moveX;
         float y = moveY;
-
+    
         if(x == 0 && y == 0)
         {
             return;
         }
-
+    
         stamina -= dashPrice;
-
+    
         if(moveX != 0 && moveY != 0)
         {
             x *= 0.7f;
             y *= 0.7f;
         }
-
+    
         Vector2 direction = new Vector2(x, y);
-
+    
         RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, dashDistance, wallLayer);
-
+    
         float totalDistance;
-
+    
         if (hit.collider != null)
         {
-            totalDistance = hit.distance;
+            totalDistance = Mathf.Max(0, hit.distance - 0.2f);
         }
         else
         {
             totalDistance = dashDistance;
         }
-
+    
         StartCoroutine(InitiateDash(transform.position + (Vector3)(direction * totalDistance)));
         GameObject go = Instantiate(dashParticle, transform.position, Quaternion.Euler(-90, 0, 0));
         if(go.TryGetComponent(out ParticleSystem particle))
@@ -175,7 +175,7 @@ public class Player : MonoBehaviour
             particle.Play();
         }
         Destroy(go, 1f);
-
+    
         Debug.DrawRay(transform.position, direction * dashDistance, Color.cyan, 0.2f);
     }
 

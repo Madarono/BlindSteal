@@ -34,6 +34,7 @@ public class BloodManager : MonoBehaviour
 
     [Header("Death Splashes")]
     public GameObject[] dynamicSplashes;
+    public float timeTillRemoval = 20f;
     public int minSplashes = 2;
     public int maxSplashes = 4;
     public float minForce = 1f;
@@ -76,6 +77,7 @@ public class BloodManager : MonoBehaviour
         float randomRot = Random.Range(minRot, maxRot);
         GameObject go = Instantiate(splashes[randomSplash].splash, place.position, Quaternion.Euler(0, 0, randomRot));
         go.transform.localScale = new Vector3(randomScale, randomScale, randomScale);
+        Destroy(go, timeTillRemoval);
     }
 
     public void DeathSplash(Transform place)
@@ -94,6 +96,7 @@ public class BloodManager : MonoBehaviour
                 float force = Random.Range(minForce, maxForce);
                 rb.AddForce(randomDir * force, ForceMode2D.Impulse);
             }
+            Destroy(go, timeTillRemoval);
         }
     }
 
