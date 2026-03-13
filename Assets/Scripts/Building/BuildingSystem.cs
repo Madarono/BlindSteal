@@ -7,11 +7,20 @@ using NavMeshPlus.Components;
 using UnityEngine.Tilemaps;
 
 [System.Serializable]
-public class HotBar
+public class ReferenceBlocks
 {
-    public Transform parent;
-    public bool isFull;
-    public InventoryItems item;
+    public TileBase block;
+    public int block_health;
+    public int amountGiven;
+    public int resourceID;
+}
+
+[System.Serializable]
+public class BlockData
+{
+    public int health;
+    public int amountGiven = 1;
+    public int resourceID = 0;
 }
 
 public class BuildingSystem : MonoBehaviour
@@ -27,14 +36,13 @@ public class BuildingSystem : MonoBehaviour
     [Header("Buildable objects")]
     public NavMeshSurface meshSurface;
     public TileBase selectedObj;
-    public TileBase[] blocks;
+    public int selectedhealth;
+    public int selectedID;
+    public int selectedAmount;
+    public ReferenceBlocks[] blocks;
     public Sprite[] blocks_sprite;
 
-    [Header("Hotbar")]
-    public GameObject hotBarPrefab;
-    public HotBar[] hotbar;
-    public GameObject hotbarSelection;
-    public int hotbarSelectionID = 0;
+    public Dictionary<Vector3Int, BlockData> blocksPlaced = new Dictionary<Vector3Int, BlockData>();
 
     void Awake()
     {
@@ -45,45 +53,16 @@ public class BuildingSystem : MonoBehaviour
     {
         SaveNewPath();
         selection.SetActive(false);
-        hotbarSelection.SetActive(false);
-        FillHotbar();
     }
 
     void Update()
     {
-        if(Input.GetKeyDown(Settings.instance.building))
-        {
-            isBuilding = !isBuilding;
-            CheckHotbarItem();
-        }
+        isBuilding = selectedObj ? true : false;
 
         if(!isBuilding)
         {
             selection.SetActive(false);
-            hotbarSelection.SetActive(false);
             return;
-        }
-
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-        hotbarSelection.SetActive(true);
-
-        if (scroll < 0f)
-        {
-            hotbarSelectionID++;
-            if(hotbarSelectionID >= hotbar.Length)
-            {
-                hotbarSelectionID = 0;
-            }
-            CheckHotbarItem();
-        }
-        else if (scroll > 0f)
-        {
-            hotbarSelectionID--;
-            if(hotbarSelectionID < 0)
-            {
-                hotbarSelectionID = hotbar.Length - 1;
-            }
-            CheckHotbarItem();
         }
 
         Vector3Int? pos = GetTilePosition();
@@ -94,82 +73,9 @@ public class BuildingSystem : MonoBehaviour
             selection.transform.position = newPos;
             if(Input.GetMouseButtonDown(0) && selectedObj != null)
             {
-                hotbar[hotbarSelectionID].item.amount--;
-                hotbar[hotbarSelectionID].item.Refresh();
                 StartCoroutine(PlaceBlock(pos.Value));
-                if(hotbar[hotbarSelectionID].item.amount == 0)
-                {
-                    Destroy(hotbar[hotbarSelectionID].item.gameObject);
-                    hotbar[hotbarSelectionID].isFull = false;
-                    hotbar[hotbarSelectionID].item = null;
-                    CheckHotbarItem();
-                }
-
-                UploadToInventory(); //Important later in the Load&Save System
+                Inventory.instance.DecreaseFromInventory(Inventory.instance.selectionID, 1);
             }
-            Debug.Log(pos);
-        }
-    }
-
-    public void CheckHotbarItem()
-    {   
-        hotbarSelection.transform.position = hotbar[hotbarSelectionID].parent.position;
-        if(hotbar[hotbarSelectionID].item != null)
-        {
-            selectedObj = blocks[hotbar[hotbarSelectionID].item.blockID];
-        }
-        else
-        {
-            selectedObj = null;
-        }
-    }
-
-    void UploadToInventory()
-    {
-        Inventory inventory = Inventory.instance;
-        inventory.items.Clear();
-        inventory.items = hotbar
-        .Where(bar => bar.isFull) 
-        .Select(bar => new HotbarItem {
-            icon = blocks_sprite[bar.item.blockID],
-            amount = bar.item.amount, 
-            blockID = bar.item.blockID}).ToList();
-    }
-    public void FillHotbar()
-    {
-        int placement = 0;
-        foreach(var item in Inventory.instance.items)
-        {
-            if(placement >= hotbar.Length)
-            {
-                break;
-            }
-
-            GameObject go = Instantiate(hotBarPrefab, hotbar[placement].parent.position, Quaternion.identity);
-            go.transform.SetParent(hotbar[placement].parent);
-            go.transform.localScale = Vector3.one;
-            if(go.TryGetComponent(out InventoryItems goScript))
-            {
-                goScript.itself.sprite = item.icon;
-                goScript.amount = item.amount;
-                goScript.blockID = item.blockID;
-                goScript.Refresh();
-                hotbar[placement].item = goScript;
-                hotbar[placement].isFull = true;
-            }
-            placement++;
-        }
-    }
-    public void ClearHotBar()
-    {
-        foreach(var bar in hotbar)
-        {
-            bar.isFull = false;
-            if(bar.item != null)
-            {
-                Destroy(bar.item.gameObject);   
-            }
-            bar.item = null;   
         }
     }
 
@@ -194,9 +100,12 @@ public class BuildingSystem : MonoBehaviour
     {
         meshSurface.UpdateNavMesh(meshSurface.navMeshData);
     }
+
     IEnumerator PlaceBlock(Vector3Int pos)
     {
         builtObjects.SetTile(pos, selectedObj);
+        blocksPlaced.Add(pos, new BlockData {health = selectedhealth, amountGiven = selectedAmount, resourceID = selectedID});
+
         yield return null;       
         shadow.DestroyOldShadowCasters();
         shadow.Create();

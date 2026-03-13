@@ -10,7 +10,6 @@ public class Settings : MonoBehaviour
     public KeyCode sprint = KeyCode.LeftShift;
     public KeyCode interact = KeyCode.E;
     public KeyCode dash = KeyCode.Space;
-    public KeyCode building = KeyCode.B;
 
     public Light2D[] totalLights;
     public Light2D globalLight;

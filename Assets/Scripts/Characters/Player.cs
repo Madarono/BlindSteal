@@ -46,6 +46,7 @@ public class Player : MonoBehaviour
 
     [Header("Switching Weapons")]
     public WeaponSwitch[] switches;
+    public Sprite neutralSprite;
     public int switchID;
     private GameObject previousWeapon;
 
@@ -67,7 +68,7 @@ public class Player : MonoBehaviour
             s.weapon.SetActive(false);
         }
 
-        SwitchWeapon();
+        // RemoveWeapon();
         canDash = true;
         speed = moveSpeed;
         o_stamina = stamina;
@@ -120,18 +121,18 @@ public class Player : MonoBehaviour
         }
 
         //Switching Weapons
-        if(scroll > 0f && !BuildingSystem.instance.isBuilding)
-        {
-            switchID++;
-            switchID = Mathf.Clamp(switchID, 0, switches.Length - 1);
-            SwitchWeapon();
-        }
-        else if(scroll < 0f && !BuildingSystem.instance.isBuilding)
-        {
-            switchID--;
-            switchID = Mathf.Clamp(switchID, 0, switches.Length - 1);
-            SwitchWeapon();
-        }
+        // if(scroll > 0f && !BuildingSystem.instance.isBuilding)
+        // {
+        //     switchID++;
+        //     switchID = Mathf.Clamp(switchID, 0, switches.Length - 1);
+        //     SwitchWeapon();
+        // }
+        // else if(scroll < 0f && !BuildingSystem.instance.isBuilding)
+        // {
+        //     switchID--;
+        //     switchID = Mathf.Clamp(switchID, 0, switches.Length - 1);
+        //     SwitchWeapon();
+        // }
 
     }
 
@@ -179,17 +180,27 @@ public class Player : MonoBehaviour
         Debug.DrawRay(transform.position, direction * dashDistance, Color.cyan, 0.2f);
     }
 
-    void SwitchWeapon()
+    public void SwitchWeapon(int id)
     {
         if(previousWeapon != null)
         {
             previousWeapon.SetActive(false);
         }
 
-        playerRend.sprite = switches[switchID].playerSprite;
-        previousWeapon = switches[switchID].weapon;
+        playerRend.sprite = switches[id].playerSprite;
+        previousWeapon = switches[id].weapon;
         previousWeapon.SetActive(true);
     }
+
+    public void RemoveWeapon()
+    {
+        if(previousWeapon != null)
+        {
+            previousWeapon.SetActive(false);
+        }
+        playerRend.sprite = neutralSprite;
+    }
+
     IEnumerator InitiateDash(Vector3 finalPlacement)
     {
         float t = 0;
