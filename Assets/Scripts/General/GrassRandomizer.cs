@@ -5,6 +5,8 @@ using UnityEngine.Tilemaps;
 
 public class GrassRandomizer : MonoBehaviour
 {
+    public static GrassRandomizer instance {get; private set;}
+
     public Tilemap ground;
     public TilemapBaker baker;
 
@@ -22,6 +24,11 @@ public class GrassRandomizer : MonoBehaviour
     public float groundChance = 40f;
     public TileBase clearTile;
 
+    void Awake()
+    {
+        instance = this;
+    }
+
     void Start()
     {
         GenerateGround(); 
@@ -31,9 +38,9 @@ public class GrassRandomizer : MonoBehaviour
 
     void GenerateGround()
     {
-        for(int x = offsetWidth; x < width - offsetWidth; x++)
+        for(int x = offsetWidth; x < width + offsetWidth; x++)
         {
-            for(int y = offsetHeight; y < height - offsetHeight; y++)
+            for(int y = offsetHeight; y < height + offsetHeight; y++)
             {
                 float chance = Random.Range(0, 100);
                 TileBase tileBase = clearTile;

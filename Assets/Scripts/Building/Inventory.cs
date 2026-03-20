@@ -13,7 +13,13 @@ public enum ResourceType
 {
     Wood,
     Rock,
-    Steel
+    RawIron,
+    RawGold,
+    RawCopper,
+    Coal,
+    Iron,
+    Gold,
+    Copper
 }
 
 [System.Serializable]

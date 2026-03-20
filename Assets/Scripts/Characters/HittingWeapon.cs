@@ -17,7 +17,7 @@ public class HittingWeapon : MonoBehaviour
             return;
         }
 
-        if(Input.GetMouseButtonDown(0) && canHit)
+        if(Input.GetMouseButton(0) && canHit)
         {
             CheckForBlock();
         }
@@ -51,7 +51,20 @@ public class HittingWeapon : MonoBehaviour
             }
             StartCoroutine(CooldownWeapon());
         }
-        //else if, checking the sprites instead
+        else if(ResourceSystem.instance.resourcesData.ContainsKey(tilePos))
+        {
+            ResourceSystem.instance.resourcesData[tilePos].health -= damage;
+            hitting.transform.position = worldPos;
+            hitting.gameObject.SetActive(true);
+            hitting.Play();
+            if(ResourceSystem.instance.resourcesData[tilePos].health <= 0)
+            {
+                Destroy(ResourceSystem.instance.resourcesData[tilePos].obj);
+                Inventory.instance.resources[ResourceSystem.instance.resourcesData[tilePos].resourceID].amount += ResourceSystem.instance.resourcesData[tilePos].amountGiven; 
+                ResourceSystem.instance.resourcesData.Remove(tilePos);
+            }
+            StartCoroutine(CooldownWeapon());
+        }
     }
 
     IEnumerator RebuildShadow()
